@@ -5,10 +5,8 @@
   <meta charset="UTF-8" />
   <!-- Using this metatag users can't scale the page using pinchIn/out gestures on mobile devices -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-  <title>Παιχνίδι μνήμης</title> 
-  <!--REMEMEBER TO RESTORE
-  <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>-->
-  <script src="createjs-2015.11.26.min.js"></script>  
+  <title>Τροφική αλυσίδα</title> 
+  <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>
   <style type="text/css">
     /* Remove margins and HTML scrollbars */
     body, html  {
@@ -45,14 +43,24 @@
   var menubar = [];
   var lvlText = "1";
   var level = 0; 
-  var bg;
-
+  var contbg;
+  var boxbg;
+  var contUp;
+  var boxUp;
+  var contDown;
+  var boxDown;
 
   function init(){
     console.clear();
     stage = new createjs.Stage("mainCanvas");
     stage.enableMouseOver();
-    
+    //background
+    contbg = new createjs.Container();
+    boxbg = new createjs.Shape();
+    stage.addChild(contbg);
+    contbg.addChild(boxbg);
+    boxbg.graphics.beginFill("#ffff99").drawRect(0,0,stage.canvas.width,stage.canvas.height);
+    //contbg = 
     // Resource preloading
     for (var i = 0; i < resourceNames.length; i++) {
 
@@ -78,8 +86,7 @@ function queueFileLoad(event) {
 
 function queueComplete(event) {
   console.log("Finished loading resources");
-  bg = new createjs.Bitmap(imgByName("background"));
-  stage.addChild(bg);
+
   
   var onMenuClick = [onMenuHelp, onMenuHome, onMenuPrevious, onMenuNext];
   for (i = 0; i < 4; i++) {
@@ -99,7 +106,7 @@ function queueComplete(event) {
     stage.addChild(menubar[i]);
     
   }
-  lvlText = new createjs.Text("1", "20px Arial", "white");
+  lvlText = new createjs.Text("1", "20px Arial", "black");
   lvlText.textAlign = "center";
   lvlText.textBaseline = "middle";
   stage.addChild(lvlText);
@@ -123,6 +130,8 @@ function resize() {
     stage.canvas.width = window.innerWidth;
     stage.canvas.height = stage.canvas.width / ratio;
   }
+
+  boxbg.graphics.beginFill("#ffff99").drawRoundRect(0,0,stage.canvas.width,stage.canvas.height,2);
   var bbs = stage.canvas.height / 10;  // bar button size
 
   var bbm = bbs / 5;  // bar button margin
@@ -151,8 +160,6 @@ function resize() {
   lvlText.font = parseInt(2*bbs/2) + "px Arial";
 
   // Fill all the canvas with the background
-  bg.scaleX = stage.canvas.width / bg.image.width;
-  bg.scaleY = stage.canvas.height / bg.image.height;
   stage.update();
 }
 

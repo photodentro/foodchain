@@ -32,8 +32,39 @@
     Your browser doesn't support HTML5!
   </canvas>
 <script>
+  function _distance(p1, p2) {
+      var dx = p1.x - p2.x;
+      var dy = p1.y - p2.y;
+      return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function _angle(p1, p2) {
+      return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+  }
+
+  function drawArrow(arrow,p1,p2,margin){
+    margin = 5;
+    var arrowSize = _distance(p1, p2);
+    var arrowRotation = _angle(p1, p2);
+    arrow.graphics.s('black')
+                        .f('white')
+                        .mt(p1.x, p1.y)
+                        .lt(p1.x, p1.y+margin)
+                        .lt(p1.x+ arrowSize - 2*margin, p1.y + margin)
+                        .lt(p1.x+ arrowSize - 2*margin, p1.y + margin)
+                        .lt(p1.x+ arrowSize, p1.y)
+                        .lt(p1.x+ arrowSize - 2*margin, p1.y - margin)
+                        .lt(p1.x, p1.y-margin)
+                        .lt(p1.x, p1.y+1);
+                        //.es();
+                arrow.alpha = 1;
+                arrow.rotation = arrowRotation;
+  }
+
+
   var stage;
-  var resourceNames = ["background","bar_help","bar_home", "bar_previous", "bar_next"];
+  var resourceNames = ["bar_help","bar_home", "bar_previous", "bar_next", 
+                      "eggplant", "caterpillar", "lark"];
   var resourcesLoaded = 0;
   var resources = [];
   var ratio = 16/9;
@@ -43,6 +74,7 @@
   var menubar = [];
   var lvlText = "1";
   var level = 0; 
+  var lvlAnimals = [];
   var contBg;
   var boxBg;
   var contUp;
@@ -52,8 +84,8 @@
   var margin;
   var boxHeight;
   var boxWidth;
-  var itemWidth;
-  var itemGap;
+  var animalWidth;
+  var animals = [];
 
   function init(){
     console.clear();
@@ -76,7 +108,6 @@
 
     // Resource preloading
     for (var i = 0; i < resourceNames.length; i++) {
-
       resources[i] = new Image();
       resources[i].src = "resource/" + resourceNames[i] + ".svg";
       resources[i].onload = queueFileLoad;
@@ -131,6 +162,22 @@ function queueComplete(event) {
 }
 
 function initLevel(newLevel) {
+  //
+  lvlAnimals = [["caterpillar","lark","eggplant"]];
+  for (i = 0; i < lvlAnimals[newLevel].length; i++) {
+    animals[i] = new createjs.Bitmap(imgByName(lvlAnimals[newLevel][i]));
+    animals[i].regX = animals[i].image.width/2;
+    animals[i].regY = animals[i].image.height/2;
+    animals[i].on("pressmove",function (e){
+      e.target.x = e.stageX;
+      e.target.y = e.stageY;
+      stage.update();
+    });
+    animals[i].on("pressup",function(e){
+    });
+    animals[i].visible = false;
+  }
+
 }
 
 function resize() {
@@ -179,6 +226,40 @@ function resize() {
   boxWidth = stage.canvas.width-2*margin;
   boxUp.graphics.clear();
   boxUp.graphics.beginFill("#6C0CE8").drawRoundRect(margin,margin,boxWidth,boxHeight,margin);
+  //arrows
+  var na = lvlAnimals[level].length;
+  var betweenMargin = 5*margin;
+  animalWidth = (stage.canvas.width - 2*margin - (na+1)*betweenMargin)/na;
+  //draw animalBoxes
+  for (var animal=0; animal < na; animal++){
+    boxUp.graphics.beginFill("#00B233").drawRoundRect(margin + betweenMargin + animal*(animalWidth + betweenMargin),margin,animalWidth,boxHeight,5);
+  }
+
+  //drawArrows
+  
+  for (var animal=0; animal < na-1; animal++){
+    p1 = new createjs.Point(margin+(animal+1)*(betweenMargin+animalWidth), boxHeight/2);
+    p2 = new createjs.Point(p1.x + betweenMargin, p1.y);
+    drawArrow(boxUp,p1,p2,margin);
+  }
+  
+  for (var animal=0; animal < na; animal++){
+    var scalex = animalWidth / animals[animal].image.width;
+    var scaley = boxHeight / animals[animal].image.height;
+    if (scalex < scaley){
+      animals[animal].scaleX = scalex;
+      animals[animal].scaleY = scalex;
+    }
+    else{
+      animals[animal].scaleX = scaley;
+      animals[animal].scaleY = scaley; 
+    }
+    animals[animal].x = animalWidth/2 + margin + betweenMargin + animal*(animalWidth + betweenMargin);
+    animals[animal].y = margin + boxHeight + margin + boxHeight/2;
+    animals[animal].visible = true;
+    contDown.addChild(animals[animal]);
+  }
+  
   boxDown.graphics.clear();
   boxDown.graphics.beginFill("#E88E0C").drawRoundRect(margin,margin + boxHeight + margin,boxWidth,boxHeight,margin);
 

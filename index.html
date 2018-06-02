@@ -43,24 +43,37 @@
   var menubar = [];
   var lvlText = "1";
   var level = 0; 
-  var contbg;
-  var boxbg;
+  var contBg;
+  var boxBg;
   var contUp;
   var boxUp;
   var contDown;
   var boxDown;
+  var margin;
+  var boxHeight;
+  var boxWidth;
+  var itemWidth;
+  var itemGap;
 
   function init(){
     console.clear();
     stage = new createjs.Stage("mainCanvas");
     stage.enableMouseOver();
     //background
-    contbg = new createjs.Container();
-    boxbg = new createjs.Shape();
-    stage.addChild(contbg);
-    contbg.addChild(boxbg);
-    boxbg.graphics.beginFill("#ffff99").drawRect(0,0,stage.canvas.width,stage.canvas.height);
-    //contbg = 
+    contBg = new createjs.Container();
+    boxBg = new createjs.Shape();
+    stage.addChild(contBg);
+    contBg.addChild(boxBg);
+    boxBg.graphics.beginFill("#ffff99").drawRect(0,0,stage.canvas.width,stage.canvas.height);
+    contUp = new createjs.Container();
+    stage.addChild(contUp);
+    boxUp = new createjs.Shape();
+    contUp.addChild(boxUp);
+    contDown = new createjs.Container();
+    stage.addChild(contDown);
+    boxDown = new createjs.Shape();
+    contDown.addChild(boxDown);
+
     // Resource preloading
     for (var i = 0; i < resourceNames.length; i++) {
 
@@ -131,9 +144,9 @@ function resize() {
     stage.canvas.height = stage.canvas.width / ratio;
   }
 
-  boxbg.graphics.beginFill("#ffff99").drawRoundRect(0,0,stage.canvas.width,stage.canvas.height,2);
-  var bbs = stage.canvas.height / 10;  // bar button size
+  boxBg.graphics.beginFill("#FFFF99").drawRoundRect(0,0,stage.canvas.width,stage.canvas.height,2);
 
+  var bbs = stage.canvas.height / 10;  // bar button size
   var bbm = bbs / 5;  // bar button margin
   // TODO: local/global variables, eslint...
   for (i = 0; i < 4; i++) {
@@ -159,7 +172,16 @@ function resize() {
   lvlText.y = stage.canvas.height - bbm/2 - bbs/2;
   lvlText.font = parseInt(2*bbs/2) + "px Arial";
 
-  // Fill all the canvas with the background
+  margin = stage.canvas.width/100;
+  //bbs + margin + boxHeight + margin + boxHeight + margin
+  // = stage.canvas.height
+  boxHeight = (stage.canvas.height - bbs - 5*margin)/2;
+  boxWidth = stage.canvas.width-2*margin;
+  boxUp.graphics.clear();
+  boxUp.graphics.beginFill("#6C0CE8").drawRoundRect(margin,margin,boxWidth,boxHeight,margin);
+  boxDown.graphics.clear();
+  boxDown.graphics.beginFill("#E88E0C").drawRoundRect(margin,margin + boxHeight + margin,boxWidth,boxHeight,margin);
+
   stage.update();
 }
 

@@ -51,8 +51,9 @@
                         .mt(p1.x, p1.y)
                         .lt(p1.x, p1.y+margin)
                         .lt(p1.x+ arrowSize - 2*margin, p1.y + margin)
-                        .lt(p1.x+ arrowSize - 2*margin, p1.y + margin)
+                        .lt(p1.x+ arrowSize - 2*margin, p1.y + 2*margin)
                         .lt(p1.x+ arrowSize, p1.y)
+                        .lt(p1.x+ arrowSize - 2*margin, p1.y - 2*margin)
                         .lt(p1.x+ arrowSize - 2*margin, p1.y - margin)
                         .lt(p1.x, p1.y-margin)
                         .lt(p1.x, p1.y+1);
@@ -165,8 +166,15 @@ function queueComplete(event) {
 function initLevel(newLevel) {
   //
   lvlAnimals = [["caterpillar","lark","eggplant"]];
-  for (i = 0; i < lvlAnimals[newLevel].length; i++) {
-    animals[i] = new createjs.Bitmap(imgByName(lvlAnimals[newLevel][i]));
+  newLevelAnimals = [];//randomized level animals
+  while (newLevelAnimals.length<lvlAnimals[newLevel].length){
+    var i = Math.floor(Math.random()*lvlAnimals[newLevel].length);
+    if (newLevelAnimals.indexOf(lvlAnimals[newLevel][i])<0){
+      newLevelAnimals.push(lvlAnimals[newLevel][i]);
+    }
+  }
+  for (i = 0; i < newLevelAnimals.length; i++) {
+    animals[i] = new createjs.Bitmap(imgByName(newLevelAnimals[i]));
     animals[i].regX = animals[i].image.width/2;
     animals[i].regY = animals[i].image.height/2;
     animals[i].on("pressmove",function (e){

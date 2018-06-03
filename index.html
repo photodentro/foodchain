@@ -91,6 +91,7 @@
     console.clear();
     stage = new createjs.Stage("mainCanvas");
     stage.enableMouseOver();
+    createjs.Touch.enable(stage);
     //background
     contBg = new createjs.Container();
     boxBg = new createjs.Shape();

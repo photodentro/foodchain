@@ -253,16 +253,10 @@ function resize() {
   }
   
   for (var animal=0; animal < na; animal++){
-    var scalex = animalWidth / animals[animal].image.width;
-    var scaley = boxHeight / animals[animal].image.height;
-    if (scalex < scaley){
-      animals[animal].scaleX = scalex;
-      animals[animal].scaleY = scalex;
-    }
-    else{
-      animals[animal].scaleX = scaley;
-      animals[animal].scaleY = scaley; 
-    }
+    var scalex = (animalWidth - 2*margin) / animals[animal].image.width;
+    var scaley = (boxHeight - 2*margin)/ animals[animal].image.height;
+    animals[animal].scaleX = Math.min(scalex,scaley);
+    animals[animal].scaleY = Math.min(scalex,scaley);
     animals[animal].x = animalWidth/2 + margin + betweenMargin + animal*(animalWidth + betweenMargin);
     animals[animal].y = margin + boxHeight + margin + boxHeight/2;
     animals[animal].visible = true;

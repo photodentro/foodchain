@@ -46,7 +46,7 @@
     margin = 5;
     var arrowSize = _distance(p1, p2);
     var arrowRotation = _angle(p1, p2);
-    arrow.graphics.s('black')
+    arrow.graphics.s('black').setStrokeStyle(1)
                         .f('white')
                         .mt(p1.x, p1.y)
                         .lt(p1.x, p1.y+margin)
@@ -165,7 +165,7 @@ function queueComplete(event) {
 
 function initLevel(newLevel) {
   //
-  lvlAnimals = [["caterpillar","lark","eggplant"]];
+  lvlAnimals = [["eggplant","caterpillar","lark",]];
   newLevelAnimals = [];//randomized level animals
   while (newLevelAnimals.length<lvlAnimals[newLevel].length){
     var i = Math.floor(Math.random()*lvlAnimals[newLevel].length);
@@ -177,12 +177,29 @@ function initLevel(newLevel) {
     animals[i] = new createjs.Bitmap(imgByName(newLevelAnimals[i]));
     animals[i].regX = animals[i].image.width/2;
     animals[i].regY = animals[i].image.height/2;
+    animals[i].order = lvlAnimals[newLevel].indexOf(newLevelAnimals[i]);
+    var hit = new createjs.Shape();
+    hit.graphics.beginFill("#000").drawRect(0,0,animals[i].image.width,animals[i].image.height);
+    animals[i].hitArea = hit;
     animals[i].on("pressmove",function (e){
       e.target.x = e.stageX;
       e.target.y = e.stageY;
       stage.update();
     });
     animals[i].on("pressup",function(e){
+      var curP = new createjs.Point(e.stageX,e.stageY);
+      var tarP = new createjs.Point(e.target.correctX,e.target.correctY);
+      var dist = _distance(curP,tarP);
+      console.log(e.stageX,e.target.x,e.target.correctX);
+      if (dist < 5*margin){
+        e.target.x = e.target.correctX;
+        e.target.y = e.target.correctY;
+      }
+      else{
+        e.target.x = e.target.origX;
+        e.target.y = e.target.origY;
+      }
+      stage.update();
     });
     animals[i].visible = false;
   }
@@ -241,7 +258,7 @@ function resize() {
   animalWidth = (stage.canvas.width - 2*margin - (na+1)*betweenMargin)/na;
   //draw animalBoxes
   for (var animal=0; animal < na; animal++){
-    boxUp.graphics.beginFill("#00B233").drawRoundRect(margin + betweenMargin + animal*(animalWidth + betweenMargin),margin,animalWidth,boxHeight,5);
+    boxUp.graphics.setStrokeStyle(margin).beginStroke("#00B233").drawRoundRect(margin + margin + betweenMargin + animal*(animalWidth + betweenMargin),margin + margin,animalWidth - 2*margin,boxHeight - 2*margin,5);
   }
 
   //drawArrows
@@ -253,12 +270,16 @@ function resize() {
   }
   
   for (var animal=0; animal < na; animal++){
-    var scalex = (animalWidth - 2*margin) / animals[animal].image.width;
-    var scaley = (boxHeight - 2*margin)/ animals[animal].image.height;
+    var scalex = (animalWidth - 4*margin) / animals[animal].image.width;
+    var scaley = (boxHeight - 4*margin)/ animals[animal].image.height;
     animals[animal].scaleX = Math.min(scalex,scaley);
     animals[animal].scaleY = Math.min(scalex,scaley);
-    animals[animal].x = animalWidth/2 + margin + betweenMargin + animal*(animalWidth + betweenMargin);
-    animals[animal].y = margin + boxHeight + margin + boxHeight/2;
+    animals[animal].origX = animalWidth/2 + margin + betweenMargin + animal*(animalWidth + betweenMargin);
+    animals[animal].origY = margin + boxHeight + margin + boxHeight/2;
+    animals[animal].correctX = animalWidth/2 + margin + betweenMargin + animals[animal].order*(animalWidth + betweenMargin);
+    animals[animal].correctY = margin  + boxHeight/2;
+    animals[animal].x = animals[animal].origX;
+    animals[animal].y = animals[animal].origY;
     animals[animal].visible = true;
     contDown.addChild(animals[animal]);
   }

@@ -64,8 +64,9 @@
 
 
   var stage;
-  var resourceNames = ["bar_help","bar_home", "bar_previous", "bar_next", 
-                      "eggplant", "caterpillar", "lark"];
+  var resourceNames = ["bar_help","bar_home", "bar_previous", "bar_next","flower_good", 
+                      "eggplant", "caterpillar", "lark", "velanidi", "mouse", "viper", "owl",
+                      "plankton","anchovy","tuna"];
   var resourcesLoaded = 0;
   var resources = [];
   var ratio = 16/9;
@@ -75,7 +76,8 @@
   var menubar = [];
   var lvlText = "1";
   var level = 0; 
-  var lvlAnimals = [];
+  var lvlAnimals = [["eggplant","caterpillar","lark",],["velanidi","mouse","viper","owl"],["plankton","anchovy","tuna"],];
+  var newLevelAnimalsRI = [];
   var contBg;
   var boxBg;
   var contUp;
@@ -87,6 +89,8 @@
   var boxWidth;
   var animalWidth;
   var animals = [];
+  var imgSuccess;
+  var endGame = false;
 
   function init(){
     console.clear();
@@ -107,6 +111,7 @@
     stage.addChild(contDown);
     boxDown = new createjs.Shape();
     contDown.addChild(boxDown);
+    
 
     // Resource preloading
     for (var i = 0; i < resourceNames.length; i++) {
@@ -152,6 +157,43 @@ function queueComplete(event) {
     stage.addChild(menubar[i]);
     
   }
+  for (i=resourceNames.indexOf("eggplant"); i<resourceNames.length; i++){//all plants and animals
+    var sa = resourceNames.indexOf("eggplant");
+    animals.push(new createjs.Bitmap(imgByName(resourceNames[i])));
+    animals[animals.length - 1].regX = animals[animals.length - 1].image.width/2;
+    animals[animals.length - 1].regY = animals[animals.length - 1].image.height/2;
+    animals[animals.length - 1].aname = resourceNames[i];
+    animals[animals.length - 1].inPlace = false;
+    var hit = new createjs.Shape();
+    hit.graphics.beginFill("#000").drawRect(0,0,animals[animals.length - 1].image.width,animals[animals.length - 1].image.height);
+    animals[animals.length -1].hitArea = hit;
+    animals[animals.length -1].on("pressmove",function (e){
+      e.target.x = e.stageX;
+      e.target.y = e.stageY;
+      stage.update();
+    });
+    animals[animals.length - 1].on("pressup",function(e){
+      var curP = new createjs.Point(e.stageX,e.stageY);
+      var tarP = new createjs.Point(e.target.correctX,e.target.correctY);
+      var dist = _distance(curP,tarP);
+      if (dist < 5*margin){
+        e.target.x = e.target.correctX;
+        e.target.y = e.target.correctY;
+        e.target.inPlace = true;
+        checkGame();
+      }
+      else{
+        e.target.x = e.target.origX;
+        e.target.y = e.target.origY;
+      }
+      stage.update();
+    });
+    animals[animals.length - 1].visible = false;
+  }
+  imgSuccess = new createjs.Bitmap(imgByName("flower_good"));
+  imgSuccess.visible = false;
+  stage.addChild(imgSuccess);
+
   lvlText = new createjs.Text("1", "20px Arial", "black");
   lvlText.textAlign = "center";
   lvlText.textBaseline = "middle";
@@ -161,49 +203,38 @@ function queueComplete(event) {
   initLevel(0);
   resize();
   window.addEventListener('resize', resize, false);
+  createjs.Ticker.on("tick", tick);
 }
 
 function initLevel(newLevel) {
   //
-  lvlAnimals = [["eggplant","caterpillar","lark",]];
-  newLevelAnimals = [];//randomized level animals
-  while (newLevelAnimals.length<lvlAnimals[newLevel].length){
-    var i = Math.floor(Math.random()*lvlAnimals[newLevel].length);
-    if (newLevelAnimals.indexOf(lvlAnimals[newLevel][i])<0){
-      newLevelAnimals.push(lvlAnimals[newLevel][i]);
+  endGame = false;//game just started
+  level = newLevel;
+  var newLevelAnimals = lvlAnimals[level];
+  var newLevelAnimalsI = [];
+  for (var i=0; i<newLevelAnimals.length; i++){
+    for (var j=0; j<animals.length; j++){
+      if (newLevelAnimals[i] == animals[j].aname){
+        newLevelAnimalsI.push(j);
+      }
+    }
+  } 
+  newLevelAnimalsRI = [];
+  while (newLevelAnimalsRI.length < newLevelAnimalsI.length){
+    var i = Math.floor(Math.random()*newLevelAnimalsI.length);
+    if (newLevelAnimalsRI.indexOf(newLevelAnimalsI[i])<0){
+      newLevelAnimalsRI.push(newLevelAnimalsI[i]);
+      newLevelAnimalsI.slice(i,1);
     }
   }
-  for (i = 0; i < newLevelAnimals.length; i++) {
-    animals[i] = new createjs.Bitmap(imgByName(newLevelAnimals[i]));
-    animals[i].regX = animals[i].image.width/2;
-    animals[i].regY = animals[i].image.height/2;
-    animals[i].order = lvlAnimals[newLevel].indexOf(newLevelAnimals[i]);
-    var hit = new createjs.Shape();
-    hit.graphics.beginFill("#000").drawRect(0,0,animals[i].image.width,animals[i].image.height);
-    animals[i].hitArea = hit;
-    animals[i].on("pressmove",function (e){
-      e.target.x = e.stageX;
-      e.target.y = e.stageY;
-      stage.update();
-    });
-    animals[i].on("pressup",function(e){
-      var curP = new createjs.Point(e.stageX,e.stageY);
-      var tarP = new createjs.Point(e.target.correctX,e.target.correctY);
-      var dist = _distance(curP,tarP);
-      console.log(e.stageX,e.target.x,e.target.correctX);
-      if (dist < 5*margin){
-        e.target.x = e.target.correctX;
-        e.target.y = e.target.correctY;
-      }
-      else{
-        e.target.x = e.target.origX;
-        e.target.y = e.target.origY;
-      }
-      stage.update();
-    });
-    animals[i].visible = false;
+  for (var i=0; i<animals.length; i++){
+    if (lvlAnimals[level].indexOf(animals[i].aname)>=0){
+      animals[i].order = lvlAnimals[level].indexOf(animals[i].aname);
+    }
+    else{
+      animals[i].order = -1;
+    }
   }
-
 }
 
 function resize() {
@@ -269,12 +300,19 @@ function resize() {
     drawArrow(boxUp,p1,p2,margin);
   }
   
-  for (var animal=0; animal < na; animal++){
+
+  for (var i=0; i < animals.length; i++){
+    animals[i].visible = false;
+  }
+  stage.update();
+  for (var i=0; i < na; i++){
+    animal = newLevelAnimalsRI[i];
+    console.log(animal);
     var scalex = (animalWidth - 4*margin) / animals[animal].image.width;
     var scaley = (boxHeight - 4*margin)/ animals[animal].image.height;
     animals[animal].scaleX = Math.min(scalex,scaley);
     animals[animal].scaleY = Math.min(scalex,scaley);
-    animals[animal].origX = animalWidth/2 + margin + betweenMargin + animal*(animalWidth + betweenMargin);
+    animals[animal].origX = animalWidth/2 + margin + betweenMargin + i*(animalWidth + betweenMargin);
     animals[animal].origY = margin + boxHeight + margin + boxHeight/2;
     animals[animal].correctX = animalWidth/2 + margin + betweenMargin + animals[animal].order*(animalWidth + betweenMargin);
     animals[animal].correctY = margin  + boxHeight/2;
@@ -283,6 +321,11 @@ function resize() {
     animals[animal].visible = true;
     contDown.addChild(animals[animal]);
   }
+
+  imgSuccess.regX = imgSuccess.image.width/2;
+  imgSuccess.regY = imgSuccess.image.height/2;
+  imgSuccess.x = stage.canvas.width/2;
+  imgSuccess.y = stage.canvas.height/2;
   
   boxDown.graphics.clear();
   boxDown.graphics.beginFill("#E88E0C").drawRoundRect(margin,margin + boxHeight + margin,boxWidth,boxHeight,margin);
@@ -300,12 +343,41 @@ function onMenuHome(event) {
 }
 
 function onMenuPrevious(event) {
-  initLevel((level+4) % 5);
+  initLevel((level+4) % lvlAnimals.length);
+  resize();
 }
 
 function onMenuNext(event) {
-  initLevel((level+1) % 5);
+  initLevel((level+1) % lvlAnimals.length);
+  resize();
 }
+
+function checkGame(){
+  endGame = true;
+  for (var i=0; i<animals.length; i++){
+    if (animals[i].visible == true && animals[i].inPlace == false){
+      endGame = false;
+      return(false);
+    }
+  }
+  setTimeout(onMenuNext,2000);
+  return(true);
+}
+
+function tick(){
+  if (endGame){
+    imgSuccess.visible = true;
+    imgSuccess.scaleX *= 1.01;
+    imgSuccess.scaleY *= 1.01;
+  }
+  else{
+    imgSuccess.visible = false;
+    imgSuccess.scaleX = 1;
+    imgSuccess.scaleY = 1;
+  }
+  stage.update();
+}
+
 
 </script>
 </body>

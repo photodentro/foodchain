@@ -101,9 +101,7 @@
     statusText = new createjs.Text("Φόρτωση...", "20px Arial", "black");
     statusText.textAlign = "center";
     statusText.textBaseline = "middle";
-    stage.addChild(statusText);
-    resize();
-    
+
 
     //background
     contBg = new createjs.Container();
@@ -119,8 +117,9 @@
     stage.addChild(contDown);
     boxDown = new createjs.Shape();
     contDown.addChild(boxDown);
-    
+    contBg.addChild(statusText);
 
+    resize();
     // Resource preloading
     for (var i = 0; i < resourceNames.length; i++) {
       resources[i] = new Image();
@@ -138,7 +137,6 @@ function imgByName(name) {
 
 function queueFileLoad(event) {
   resourcesLoaded++;
-  console.log(resourcesLoaded);
   statusText.text = "Φόρτωση " + parseInt(100*resourcesLoaded/resourceNames.length) + " %";
   stage.update();
   if (resourcesLoaded == resourceNames.length)
@@ -258,7 +256,7 @@ function resize() {
     stage.canvas.width = window.innerWidth;
     stage.canvas.height = stage.canvas.width / ratio;
   }
-
+  boxBg.graphics.beginFill("#FFFF99").drawRoundRect(0,0,stage.canvas.width,stage.canvas.height,2);
   if (!menubar[0]) {
     statusText.x = stage.canvas.width / 2;
     statusText.y = stage.canvas.height / 2;
@@ -272,7 +270,7 @@ function resize() {
     statusText.visible = false;
   }
 
-  boxBg.graphics.beginFill("#FFFF99").drawRoundRect(0,0,stage.canvas.width,stage.canvas.height,2);
+  
 
   var bbs = stage.canvas.height / 10;  // bar button size
   var bbm = bbs / 5;  // bar button margin

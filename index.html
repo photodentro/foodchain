@@ -67,7 +67,7 @@
   var statusText = "";
   var resourceNames = ["bar_help.svg","bar_home.svg", "bar_previous.svg", "bar_next.svg","flower_good.svg", 
                       "eggplant.png", "caterpillar.png", "lark.png", "velanidi.png", "mouse.png", "viper.png", "owl.png",
-                      "plankton.png","anchovy.png","tuna.png"];
+                      "plankton.png","anchovy.png","tuna.svg"];
   var resourcesLoaded = 0;
   var resources = [];
   var ratio = 16/9;
@@ -77,7 +77,7 @@
   var menubar = [];
   var lvlText = "1";
   var level = 0; 
-  var lvlAnimals = [["eggplant.png","caterpillar.png","lark.png",],["velanidi.png","mouse.png","viper.png","owl.png"],["plankton.png","anchovy.png","tuna.png"],];
+  var lvlAnimals = [["eggplant.png","caterpillar.png","lark.png",],["velanidi.png","mouse.png","viper.png","owl.png"],["plankton.png","anchovy.png","tuna.svg"],];
   var newLevelAnimalsRI = [];
   var contBg;
   var boxBg;
@@ -103,6 +103,7 @@
     statusText.textBaseline = "middle";
     stage.addChild(statusText);
     resize();
+    
 
     //background
     contBg = new createjs.Container();
@@ -257,11 +258,14 @@ function resize() {
     stage.canvas.width = window.innerWidth;
     stage.canvas.height = stage.canvas.width / ratio;
   }
+
   if (!menubar[0]) {
     statusText.x = stage.canvas.width / 2;
     statusText.y = stage.canvas.height / 2;
     statusText.font = parseInt(stage.canvas.height/10) + "px Arial";
+    stage.setChildIndex(statusText,stage.numChildren - 1);
     statusText.visible = true;
+    stage.update();
     return;
   }
   else{

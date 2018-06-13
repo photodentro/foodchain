@@ -64,9 +64,10 @@
 
 
   var stage;
-  var resourceNames = ["bar_help","bar_home", "bar_previous", "bar_next","flower_good", 
-                      "eggplant", "caterpillar", "lark", "velanidi", "mouse", "viper", "owl",
-                      "plankton","anchovy","tuna"];
+  var statusText = "";
+  var resourceNames = ["bar_help.svg","bar_home.svg", "bar_previous.svg", "bar_next.svg","flower_good.svg", 
+                      "eggplant.png", "caterpillar.png", "lark.png", "velanidi.png", "mouse.png", "viper.png", "owl.png",
+                      "plankton.png","anchovy.png","tuna.png"];
   var resourcesLoaded = 0;
   var resources = [];
   var ratio = 16/9;
@@ -76,7 +77,7 @@
   var menubar = [];
   var lvlText = "1";
   var level = 0; 
-  var lvlAnimals = [["eggplant","caterpillar","lark",],["velanidi","mouse","viper","owl"],["plankton","anchovy","tuna"],];
+  var lvlAnimals = [["eggplant.png","caterpillar.png","lark.png",],["velanidi.png","mouse.png","viper.png","owl.png"],["plankton.png","anchovy.png","tuna.png"],];
   var newLevelAnimalsRI = [];
   var contBg;
   var boxBg;
@@ -97,6 +98,12 @@
     stage = new createjs.Stage("mainCanvas");
     stage.enableMouseOver();
     createjs.Touch.enable(stage);
+    statusText = new createjs.Text("Φόρτωση...", "20px Arial", "black");
+    statusText.textAlign = "center";
+    statusText.textBaseline = "middle";
+    stage.addChild(statusText);
+    resize();
+
     //background
     contBg = new createjs.Container();
     boxBg = new createjs.Shape();
@@ -116,7 +123,7 @@
     // Resource preloading
     for (var i = 0; i < resourceNames.length; i++) {
       resources[i] = new Image();
-      resources[i].src = "resource/" + resourceNames[i] + ".svg";
+      resources[i].src = "resource/" + resourceNames[i];
       resources[i].onload = queueFileLoad;
 
     }
@@ -130,6 +137,8 @@ function imgByName(name) {
 
 function queueFileLoad(event) {
   resourcesLoaded++;
+  console.log(resourcesLoaded);
+  statusText.text = "Φόρτωση " + parseInt(100*resourcesLoaded/resourceNames.length) + " %";
   stage.update();
   if (resourcesLoaded == resourceNames.length)
     queueComplete(event);
@@ -142,7 +151,7 @@ function queueComplete(event) {
   var onMenuClick = [onMenuHelp, onMenuHome, onMenuPrevious, onMenuNext];
   for (i = 0; i < 4; i++) {
 
-    menubar[i] = new createjs.Bitmap(resources[resourceNames.indexOf('bar_help')+i]);
+    menubar[i] = new createjs.Bitmap(resources[resourceNames.indexOf('bar_help.svg')+i]);
     menubar[i].addEventListener("click", onMenuClick[i]);
     menubar[i].addEventListener("mouseover", function(event) {
         // Bring the target on top in its container, mostly for the rotation animation
@@ -157,8 +166,8 @@ function queueComplete(event) {
     stage.addChild(menubar[i]);
     
   }
-  for (i=resourceNames.indexOf("eggplant"); i<resourceNames.length; i++){//all plants and animals
-    var sa = resourceNames.indexOf("eggplant");
+  for (i=resourceNames.indexOf("eggplant.png"); i<resourceNames.length; i++){//all plants and animals
+    var sa = resourceNames.indexOf("eggplant.png");
     animals.push(new createjs.Bitmap(imgByName(resourceNames[i])));
     animals[animals.length - 1].regX = animals[animals.length - 1].image.width/2;
     animals[animals.length - 1].regY = animals[animals.length - 1].image.height/2;
@@ -190,7 +199,7 @@ function queueComplete(event) {
     });
     animals[animals.length - 1].visible = false;
   }
-  imgSuccess = new createjs.Bitmap(imgByName("flower_good"));
+  imgSuccess = new createjs.Bitmap(imgByName("flower_good.svg"));
   imgSuccess.visible = false;
   stage.addChild(imgSuccess);
 
@@ -230,6 +239,7 @@ function initLevel(newLevel) {
   for (var i=0; i<animals.length; i++){
     if (lvlAnimals[level].indexOf(animals[i].aname)>=0){
       animals[i].order = lvlAnimals[level].indexOf(animals[i].aname);
+      animals[i].inPlace = false;
     }
     else{
       animals[i].order = -1;
@@ -246,6 +256,16 @@ function resize() {
   } else {
     stage.canvas.width = window.innerWidth;
     stage.canvas.height = stage.canvas.width / ratio;
+  }
+  if (!menubar[0]) {
+    statusText.x = stage.canvas.width / 2;
+    statusText.y = stage.canvas.height / 2;
+    statusText.font = parseInt(stage.canvas.height/10) + "px Arial";
+    statusText.visible = true;
+    return;
+  }
+  else{
+    statusText.visible = false;
   }
 
   boxBg.graphics.beginFill("#FFFF99").drawRoundRect(0,0,stage.canvas.width,stage.canvas.height,2);
@@ -322,11 +342,13 @@ function resize() {
     contDown.addChild(animals[animal]);
   }
 
-  imgSuccess.regX = imgSuccess.image.width/2;
-  imgSuccess.regY = imgSuccess.image.height/2;
-  imgSuccess.x = stage.canvas.width/2;
-  imgSuccess.y = stage.canvas.height/2;
-  
+  imgSuccess.scaleY = (2/3) * stage.canvas.height / imgSuccess.image.height;
+  imgSuccess.scaleX = imgSuccess.scaleY;
+  imgSuccess.regX = imgSuccess.image.width / 2;
+  imgSuccess.regY = imgSuccess.image.height / 2;
+  imgSuccess.x = stage.canvas.width / 2;
+  imgSuccess.y = stage.canvas.height / 2;
+
   boxDown.graphics.clear();
   boxDown.graphics.beginFill("#E88E0C").drawRoundRect(margin,margin + boxHeight + margin,boxWidth,boxHeight,margin);
 
@@ -335,7 +357,7 @@ function resize() {
 
 
 function onMenuHelp(event) {
-  alert("Επιλέξτε εικόνες από το κάτω κουτί και βάλτε τις στο δεξί κουτί έτσι ώστε να ταιριάζουν με το αριστερό κουτί.");
+  alert("Συμπληρώστε τη τροφική αλυσίδα.");
 }
 
 function onMenuHome(event) {

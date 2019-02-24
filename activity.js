@@ -231,8 +231,6 @@ function checkLevelOver() {
 
 
   for (i = 0; i < act.levels[act.level].length; i += 1) {
-    console.log('rotate');
-    console.log(sformat('d{}',i));
     setKeyframes(ge(sformat('d{}', i)), [
       sformat('from { transform: rotate({}deg); }', -360 * (2 * (i % 2) - 1)),
       'to { transform: rotate(0deg); }'].join('\n'), '3s');

@@ -1,420 +1,49 @@
-<!doctype html> 
-<!-- Copyright (C) 2018 Alkis Georgopoulos <alkisg@gmail.com>. License: GPLv3. -->
-<html lang="el"> 
-<head> 
-  <meta charset="UTF-8" />
-  <!-- Using this metatag users can't scale the page using pinchIn/out gestures on mobile devices -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-  <title>Τροφική αλυσίδα</title> 
-  <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>
-  <style type="text/css">
-    /* Remove margins and HTML scrollbars */
-    body, html  {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background-color: black;
-    }
-    #mainCanvas {
-    padding: 0;
-    margin: auto;
-    display: block;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    }
+<!doctype html>
+<!--
+Copyright (C) 2018 Alkis Georgopoulos <alkisg@gmail.com>.
+SPDX-License-Identifier: CC-BY-SA-4.0
+-->
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Τροφική αλυσίδα</title>
+  <style>
+    /* Dummy style for animations */
   </style>
+  <link rel="stylesheet" type="text/css" href="activity.css">
+  <script src="activity.js"></script>
 </head>
-<body onload = "init();">
-  <canvas id="mainCanvas" width="320" height="180">
-    Your browser doesn't support HTML5!
-  </canvas>
-<script>
-  function _distance(p1, p2) {
-      var dx = p1.x - p2.x;
-      var dy = p1.y - p2.y;
-      return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  function _angle(p1, p2) {
-      return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
-  }
-
-  function drawArrow(arrow,p1,p2,margin){
-    margin = 5;
-    var arrowSize = _distance(p1, p2);
-    var arrowRotation = _angle(p1, p2);
-    arrow.graphics.s('black').setStrokeStyle(1)
-                        .f('white')
-                        .mt(p1.x, p1.y)
-                        .lt(p1.x, p1.y+margin)
-                        .lt(p1.x+ arrowSize - 2*margin, p1.y + margin)
-                        .lt(p1.x+ arrowSize - 2*margin, p1.y + 2*margin)
-                        .lt(p1.x+ arrowSize, p1.y)
-                        .lt(p1.x+ arrowSize - 2*margin, p1.y - 2*margin)
-                        .lt(p1.x+ arrowSize - 2*margin, p1.y - margin)
-                        .lt(p1.x, p1.y-margin)
-                        .lt(p1.x, p1.y+1);
-                        //.es();
-                arrow.alpha = 1;
-                arrow.rotation = arrowRotation;
-  }
-
-
-  var stage;
-  var statusText = "";
-  var resourceNames = ['bar_home.svg', 'bar_help.svg', 'bar_about.svg', 'bar_previous.svg', 'bar_next.svg',"flower_good.svg", 
-                      "eggplant.png", "caterpillar.png", "lark.png", "velanidi.png", "mouse.png", "viper.png", "owl.png",
-                      "plankton.png","anchovy.png","tuna.svg"];
-  var resourcesLoaded = 0;
-  var resources = [];
-  var ratio = 16/9;
-  var winratio;
-  var boxl;
-  var boxr;
-  var menubar = [];
-  var lvlText = "1";
-  var level = 0; 
-  var lvlAnimals = [["eggplant.png","caterpillar.png","lark.png",],["velanidi.png","mouse.png","viper.png","owl.png"],["plankton.png","anchovy.png","tuna.svg"],];
-  var newLevelAnimalsRI = [];
-  var contBg;
-  var boxBg;
-  var contUp;
-  var boxUp;
-  var contDown;
-  var boxDown;
-  var margin;
-  var boxHeight;
-  var boxWidth;
-  var animalWidth;
-  var animals = [];
-  var imgSuccess;
-  var endGame = false;
-
-  function init(){
-    console.clear();
-    stage = new createjs.Stage("mainCanvas");
-    stage.enableMouseOver();
-    createjs.Touch.enable(stage);
-    statusText = new createjs.Text("Φόρτωση...", "20px Arial", "black");
-    statusText.textAlign = "center";
-    statusText.textBaseline = "middle";
-
-
-    //background
-    contBg = new createjs.Container();
-    boxBg = new createjs.Shape();
-    stage.addChild(contBg);
-    contBg.addChild(boxBg);
-    boxBg.graphics.beginFill("#ffff99").drawRect(0,0,stage.canvas.width,stage.canvas.height);
-    contUp = new createjs.Container();
-    stage.addChild(contUp);
-    boxUp = new createjs.Shape();
-    contUp.addChild(boxUp);
-    contDown = new createjs.Container();
-    stage.addChild(contDown);
-    boxDown = new createjs.Shape();
-    contDown.addChild(boxDown);
-    contBg.addChild(statusText);
-
-    resize();
-    // Resource preloading
-    for (var i = 0; i < resourceNames.length; i++) {
-      resources[i] = new Image();
-      resources[i].src = "resource/" + resourceNames[i];
-      resources[i].onload = queueFileLoad;
-
-    }
-    // The last queueFileLoad calls queueComplete. Execution continues there.
-
-  }
-
-function imgByName(name) {
-  return resources[resourceNames.indexOf(name)];
-}
-
-function queueFileLoad(event) {
-  resourcesLoaded++;
-  statusText.text = "Φόρτωση " + parseInt(100*resourcesLoaded/resourceNames.length) + " %";
-  stage.update();
-  if (resourcesLoaded == resourceNames.length)
-    queueComplete(event);
-}
-
-function queueComplete(event) {
-  console.log("Finished loading resources");
-
-  
-  var onMenuClick = [onMenuHome, onMenuHelp, onMenuAbout, onMenuPrevious, onMenuNext];
-  for (i = 0; i < 5; i++) {
-
-    menubar[i] = new createjs.Bitmap(resources[resourceNames.indexOf('bar_home.svg')+i]);
-    menubar[i].addEventListener("click", onMenuClick[i]);
-    menubar[i].addEventListener("mouseover", function(event) {
-        // Bring the target on top in its container, mostly for the rotation animation
-        event.target.parent.setChildIndex(event.target, event.target.parent.numChildren - 1);
-        event.target.scaleX = 1.2*event.target.savedscaleX;
-        event.target.scaleY = 1.2*event.target.savedscaleY;
-        stage.update();});
-    menubar[i].addEventListener("mouseout", function(event) {
-        event.target.scaleX = event.target.savedscaleX;
-        event.target.scaleY = event.target.savedscaleY;
-        stage.update();});
-    stage.addChild(menubar[i]);
-    
-  }
-  for (i=resourceNames.indexOf("eggplant.png"); i<resourceNames.length; i++){//all plants and animals
-    var sa = resourceNames.indexOf("eggplant.png");
-    animals.push(new createjs.Bitmap(imgByName(resourceNames[i])));
-    animals[animals.length - 1].regX = animals[animals.length - 1].image.width/2;
-    animals[animals.length - 1].regY = animals[animals.length - 1].image.height/2;
-    animals[animals.length - 1].aname = resourceNames[i];
-    animals[animals.length - 1].inPlace = false;
-    var hit = new createjs.Shape();
-    hit.graphics.beginFill("#000").drawRect(0,0,animals[animals.length - 1].image.width,animals[animals.length - 1].image.height);
-    animals[animals.length -1].hitArea = hit;
-    animals[animals.length -1].on("pressmove",function (e){
-      e.target.x = e.stageX;
-      e.target.y = e.stageY;
-      stage.update();
-    });
-    animals[animals.length - 1].on("pressup",function(e){
-      var curP = new createjs.Point(e.stageX,e.stageY);
-      var tarP = new createjs.Point(e.target.correctX,e.target.correctY);
-      var dist = _distance(curP,tarP);
-      if (dist < 5*margin){
-        e.target.x = e.target.correctX;
-        e.target.y = e.target.correctY;
-        e.target.inPlace = true;
-        checkGame();
-      }
-      else{
-        e.target.x = e.target.origX;
-        e.target.y = e.target.origY;
-      }
-      stage.update();
-    });
-    animals[animals.length - 1].visible = false;
-  }
-  imgSuccess = new createjs.Bitmap(imgByName("flower_good.svg"));
-  imgSuccess.visible = false;
-  stage.addChild(imgSuccess);
-
-  lvlText = new createjs.Text("1", "20px Arial", "black");
-  lvlText.textAlign = "center";
-  lvlText.textBaseline = "middle";
-  stage.addChild(lvlText);
-
-  stage.update();
-  initLevel(0);
-  resize();
-  window.addEventListener('resize', resize, false);
-  createjs.Ticker.on("tick", tick);
-}
-
-function initLevel(newLevel) {
-  //
-  endGame = false;//game just started
-  level = newLevel;
-  var newLevelAnimals = lvlAnimals[level];
-  var newLevelAnimalsI = [];
-  for (var i=0; i<newLevelAnimals.length; i++){
-    for (var j=0; j<animals.length; j++){
-      if (newLevelAnimals[i] == animals[j].aname){
-        newLevelAnimalsI.push(j);
-      }
-    }
-  } 
-  newLevelAnimalsRI = [];
-  while (newLevelAnimalsRI.length < newLevelAnimalsI.length){
-    var i = Math.floor(Math.random()*newLevelAnimalsI.length);
-    if (newLevelAnimalsRI.indexOf(newLevelAnimalsI[i])<0){
-      newLevelAnimalsRI.push(newLevelAnimalsI[i]);
-      newLevelAnimalsI.slice(i,1);
-    }
-  }
-  for (var i=0; i<animals.length; i++){
-    if (lvlAnimals[level].indexOf(animals[i].aname)>=0){
-      animals[i].order = lvlAnimals[level].indexOf(animals[i].aname);
-      animals[i].inPlace = false;
-    }
-    else{
-      animals[i].order = -1;
-    }
-  }
-}
-
-function resize() {
-  // Resize the canvas element
-  winratio = window.innerWidth/window.innerHeight;
-  if (winratio >= ratio) {
-    stage.canvas.height = window.innerHeight;
-    stage.canvas.width = stage.canvas.height * ratio;
-  } else {
-    stage.canvas.width = window.innerWidth;
-    stage.canvas.height = stage.canvas.width / ratio;
-  }
-  
-  boxBg.graphics.beginFill("#FFFF99").drawRoundRect(0,0,stage.canvas.width,stage.canvas.height,2);
-  contBg.addChild(boxBg);
-  if (!menubar[0]) {
-    statusText.x = stage.canvas.width / 2;
-    statusText.y = stage.canvas.height / 2;
-    statusText.font = parseInt(stage.canvas.height/10) + "px Arial";
-    stage.setChildIndex(statusText,stage.numChildren - 1);
-    statusText.visible = true;
-    stage.update();
-    return;
-  }
-  else{
-    statusText.visible = false;
-  }
-
-  
-
-  var bbs = stage.canvas.height / 10;  // bar button size
-  var bbm = bbs / 5;  // bar button margin
-  // TODO: local/global variables, eslint...
-  for (i = 0; i < 5; i++) {
-    // Leave one space for the level
-    if (i < 4)
-      j = i;
-    else
-      j = i + 1;
-    menubar[i].scaleX = bbs / menubar[i].image.width;
-    menubar[i].scaleY = bbs / menubar[i].image.height;
-    menubar[i].regX = menubar[i].image.width / 2;
-    menubar[i].regY = menubar[i].image.height / 2;
-    menubar[i].x = (j + 1)*bbm + bbs/2 + j*bbs;
-    menubar[i].y = stage.canvas.height - bbm - bbs/2;
-    // These copies are used to preserve the original scale on mouseover
-    menubar[i].savedscaleX = menubar[i].scaleX;
-    menubar[i].savedscaleY = menubar[i].scaleY;
-  }
-
-  lvlText.text = level + 1;
-  lvlText.x = (4 + 1)*bbm + bbs/2 + 4*bbs;
-  lvlText.y = stage.canvas.height - bbm/2 - bbs/2;
-  lvlText.font = parseInt(2*bbs/2) + "px Arial";
-
-  // If level is single digit, move lvlText and bar_previous a bit left
-  if (level + 1 < 10) {
-    lvlText.x -= bbs/4;
-    menubar[4].x -= bbs/2;
-  }
-
-  margin = stage.canvas.width/100;
-  //bbs + margin + boxHeight + margin + boxHeight + margin
-  // = stage.canvas.height
-  boxHeight = (stage.canvas.height - bbs - 5*margin)/2;
-  boxWidth = stage.canvas.width-2*margin;
-  boxUp.graphics.clear();
-  boxUp.graphics.beginFill("#6C0CE8").drawRoundRect(margin,margin,boxWidth,boxHeight,margin);
-  //arrows
-  var na = lvlAnimals[level].length;
-  var betweenMargin = 5*margin;
-  animalWidth = (stage.canvas.width - 2*margin - (na+1)*betweenMargin)/na;
-  //draw animalBoxes
-  for (var animal=0; animal < na; animal++){
-    boxUp.graphics.setStrokeStyle(margin).beginStroke("#00B233").drawRoundRect(margin + margin + betweenMargin + animal*(animalWidth + betweenMargin),margin + margin,animalWidth - 2*margin,boxHeight - 2*margin,5);
-  }
-
-  //drawArrows
-  
-  for (var animal=0; animal < na-1; animal++){
-    p1 = new createjs.Point(margin+(animal+1)*(betweenMargin+animalWidth), boxHeight/2);
-    p2 = new createjs.Point(p1.x + betweenMargin, p1.y);
-    drawArrow(boxUp,p1,p2,margin);
-  }
-  
-
-  for (var i=0; i < animals.length; i++){
-    animals[i].visible = false;
-  }
-  stage.update();
-  for (var i=0; i < na; i++){
-    animal = newLevelAnimalsRI[i];
-    console.log(animal);
-    var scalex = (animalWidth - 4*margin) / animals[animal].image.width;
-    var scaley = (boxHeight - 4*margin)/ animals[animal].image.height;
-    animals[animal].scaleX = Math.min(scalex,scaley);
-    animals[animal].scaleY = Math.min(scalex,scaley);
-    animals[animal].origX = animalWidth/2 + margin + betweenMargin + i*(animalWidth + betweenMargin);
-    animals[animal].origY = margin + boxHeight + margin + boxHeight/2;
-    animals[animal].correctX = animalWidth/2 + margin + betweenMargin + animals[animal].order*(animalWidth + betweenMargin);
-    animals[animal].correctY = margin  + boxHeight/2;
-    animals[animal].x = animals[animal].origX;
-    animals[animal].y = animals[animal].origY;
-    animals[animal].visible = true;
-    contDown.addChild(animals[animal]);
-  }
-
-  imgSuccess.scaleY = (2/3) * stage.canvas.height / imgSuccess.image.height;
-  imgSuccess.scaleX = imgSuccess.scaleY;
-  imgSuccess.regX = imgSuccess.image.width / 2;
-  imgSuccess.regY = imgSuccess.image.height / 2;
-  imgSuccess.x = stage.canvas.width / 2;
-  imgSuccess.y = stage.canvas.height / 2;
-
-  boxDown.graphics.clear();
-  boxDown.graphics.beginFill("#E88E0C").drawRoundRect(margin,margin + boxHeight + margin,boxWidth,boxHeight,margin);
-
-  stage.update();
-}
-
-
-function onMenuAbout(event) {
-  window.open("credits/index_DS_II.html");
-}
-
-
-function onMenuHelp(event) {
-  alert("Συμπληρώστε τη τροφική αλυσίδα.");
-}
-
-function onMenuHome(event) {
-  window.history.back();
-}
-
-function onMenuPrevious(event) {
-  initLevel((level+4) % lvlAnimals.length);
-  resize();
-}
-
-function onMenuNext(event) {
-  initLevel((level+1) % lvlAnimals.length);
-  resize();
-}
-
-function checkGame(){
-  endGame = true;
-  for (var i=0; i<animals.length; i++){
-    if (animals[i].visible == true && animals[i].inPlace == false){
-      endGame = false;
-      return(false);
-    }
-  }
-  setTimeout(onMenuNext,2000);
-  return(true);
-}
-
-function tick(){
-  if (endGame){
-    imgSuccess.visible = true;
-    imgSuccess.scaleX *= 1.01;
-    imgSuccess.scaleY *= 1.01;
-  }
-  else{
-    imgSuccess.visible = false;
-    imgSuccess.scaleX = 1;
-    imgSuccess.scaleY = 1;
-  }
-  stage.update();
-}
-
-
-</script>
+<body>
+<div id="main">
+  <div id="decrypted">
+    <img id="d0" src="resource/l.svg" alt="">
+    <p class="arrow" id="ar0">⮕</p>
+    <img id="d1" src="resource/l.svg" alt="">
+    <p class="arrow" id="ar1">⮕</p>
+    <img id="d2" src="resource/l.svg" alt="">
+    <p class="arrow" id="ar2">⮕</p>
+    <img id="d3" src="resource/l.svg" alt="">
+    <p class="arrow" id="ar3">⮕</p>
+    <img id="d4" src="resource/l.svg" alt="">
+  </div>
+  <div id="stock">
+    <img id="s0" src="resource/l.svg" alt="">
+    <img id="s1" src="resource/l.svg" alt="">
+    <img id="s2" src="resource/l.svg" alt="">
+    <img id="s3" src="resource/l.svg" alt="">
+    <img id="s4" src="resource/l.svg" alt="">
+  </div>
+  <div id="menubar">
+    <img id="bar_home" src="resource/bar_home.svg" alt="Αρχική" title="Επιστροφή στην αρχική σελίδα">
+    <img id="bar_help" src="resource/bar_help.svg" alt="Βοήθεια" title="Βοήθεια">
+    <img id="bar_about" src="resource/bar_about.svg" alt="Περί" title="Περί">
+    <img id="bar_fullscreen" src="resource/bar_fullscreen.svg" alt="Πλήρης οθόνη" title="Πλήρης οθόνη">
+    <img id="bar_previous" src="resource/bar_previous.svg" alt="Προηγούμενο" title="Προηγούμενο επίπεδο">
+    <p id="level">1</p>
+    <img id="bar_next" src="resource/bar_next.svg" alt="Επόμενο" title="Επόμενο επίπεδο">
+  </div>
+</div>
+<img id="dragimg" src="resource/l0.svg" alt="">
+<div id="help"><div class="dialog">Σύρετε από το κάτω κουτί τα ζώα στο πάνω κουτί ώστε να συμπληρώσετε την τροφική αλυσίδα. Κάθε οργανισμός τρέφεται από τον προηγούμενο.</div></div>
 </body>
 </html>

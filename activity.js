@@ -287,7 +287,7 @@ function initLevel(newLevel) {
 
 function initActivity() {
   var i;
-
+  ge('loading').style.display = "none";
   act = {
     level: 0,
     giftsNum: -1,

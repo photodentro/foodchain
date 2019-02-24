@@ -181,3 +181,7 @@ body {
   filter: drop-shadow(0.5em 0.5em 0.5em rgb(80,80,80));
   font-size: 2em;
 }
+
+#loading {
+  display: block;
+}

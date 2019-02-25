@@ -350,10 +350,10 @@ function initActivity() {
 }
 //load all other level images after the first level is shown
 imgs = {1:[],2:[],3:[],4:[],5:[]};
-for (i=1; i<levels.length; i++){
-    for (var j=0; j<levels[i].length; j++){
+for (i=1; i<act.levels.length; i++){
+    for (var j=0; j<act.levels[i].length; j++){
         imgs[i].push(new Image());
-        imgs[i][j].src = sformat('resource/{}',levels[i][j])
+        imgs[i][j].src = sformat('resource/{}',act.levels[i][j])
     }
 }
 window.onerror = onError;

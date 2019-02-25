@@ -348,7 +348,14 @@ function initActivity() {
   }
   initLevel(act.level);
 }
-
+//load all other level images after the first level is shown
+imgs = {1:[],2:[],3:[],4:[],5:[]};
+for (i=1; i<levels.length; i++){
+    for (var j=0; j<levels[i].length; j++){
+        imgs[i].push(new Image());
+        imgs[i][j].src = sformat('resource/{}',levels[i][j])
+    }
+}
 window.onerror = onError;
 window.onload = initActivity;
 // Call onResize even before the images are loaded

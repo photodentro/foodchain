@@ -347,15 +347,16 @@ function initActivity() {
     document.images[i].ondragstart = doPreventDefault;
   }
   initLevel(act.level);
-}
-//load all other level images after the first level is shown
-imgs = {1:[],2:[],3:[],4:[],5:[]};
-for (i=1; i<act.levels.length; i++){
+  //load all other level images after the first level is shown
+  imgs = {1:[],2:[],3:[],4:[],5:[]};
+  for (i=1; i<act.levels.length; i++){
     for (var j=0; j<act.levels[i].length; j++){
         imgs[i].push(new Image());
-        imgs[i][j].src = sformat('resource/{}',act.levels[i][j])
+        imgs[i][j].src = sformat('resource/{}',act.levels[i][j]);
     }
 }
+}
+
 window.onerror = onError;
 window.onload = initActivity;
 // Call onResize even before the images are loaded

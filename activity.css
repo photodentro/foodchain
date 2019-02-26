@@ -57,15 +57,16 @@ body {
   border-radius: 1em;
 }
 
-#decrypted img {
+.dimg {
   width: 10em;
   height: 10em;
   padding: 1em;
   border-radius: 2em;
 }
 
-.arrow {
-  font-size: 3em;
+.arrimg {
+  width:2em;
+  height:10em;
 }
 
 #stock {
@@ -182,6 +183,3 @@ body {
   font-size: 2em;
 }
 
-#loading {
-  display: block;
-}

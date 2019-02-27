@@ -26,7 +26,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.959798"
-     inkscape:cx="-7.7027789"
+     inkscape:cx="-48.740226"
      inkscape:cy="25.270489"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -65,7 +65,8 @@
       <path
          d="m 137.40772,27.426289 4.99473,3.768963 -4.99473,3.780419 v -2.062047 h -14.11357 v -3.425288 h 14.11357 z"
          style="fill:#ffffff;fill-opacity:1;stroke-width:0.58653766"
-         id="path814" />
+         id="path814"
+         inkscape:connector-curvature="0" />
     </g>
   </g>
 </svg>

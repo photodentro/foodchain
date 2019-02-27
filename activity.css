@@ -62,8 +62,31 @@ body {
   height: 10em;
   padding: 1em;
   border-radius: 2em;
+  cursor: move;
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
 }
 
+.dimg:hover {
+  -webkit-filter: brightness(120%) contrast(1.2);
+  filter: brightness(120%) contrast(1.2);
+  transform: scale(1.1);
+  border-radius: ;
+}
+
+#decrypted img:active {
+  opacity: 0.5;
+}
+
+/*
+.dimg {
+  width: 10em;
+  height: 10em;
+  padding: 1em;
+  border-radius: 2em;
+}
+*/
 .arrimg {
   width:2em;
   height:10em;

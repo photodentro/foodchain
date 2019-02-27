@@ -26,7 +26,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.959798"
-     inkscape:cx="33.334668"
+     inkscape:cx="-7.7027789"
      inkscape:cy="25.270489"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -48,7 +48,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -57,17 +57,15 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-46.132292,-73.30009)">
-    <text
-       xml:space="preserve"
+    <g
+       aria-label="⮕"
+       transform="scale(0.37416447,2.6726215)"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:23.4615078px;line-height:1.25;font-family:'Wingdings 2';-inkscape-font-specification:'Wingdings 2 Bold';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.58653766"
-       x="121.57578"
-       y="39.019573"
-       id="text817"
-       transform="scale(0.37416447,2.6726215)"><tspan
-         sodipodi:role="line"
-         id="tspan815"
-         x="121.57578"
-         y="39.019573"
-         style="fill:#ffffff;fill-opacity:1;stroke-width:0.58653766">⮕</tspan></text>
+       id="text817">
+      <path
+         d="m 137.40772,27.426289 4.99473,3.768963 -4.99473,3.780419 v -2.062047 h -14.11357 v -3.425288 h 14.11357 z"
+         style="fill:#ffffff;fill-opacity:1;stroke-width:0.58653766"
+         id="path814" />
+    </g>
   </g>
 </svg>

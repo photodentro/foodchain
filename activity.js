@@ -47,6 +47,10 @@ function shuffle(a) {
   return result;
 }
 
+function isEmpty(obj){
+  return(obj.src.substr(obj.src.length-5)=='l.svg');
+}
+
 function generateStock() {
   var i;
   var result = [];  // Those are arrays of objects, not strings
@@ -176,15 +180,20 @@ function onUp(x, y) {
   dro = act.dragobj;
   act.dragobj = null;
   el = document.elementFromPoint(x, y);
-  if (!el || (el.parentElement.id !== 'decrypted')) {
+  console.log(el);
+  if (!(el.className=="dimg")&&!(el.className=="simg")){
+    return;
+  }
+  if (!el || !isEmpty(el)) {
     return;
   }
   el.$ord = dro.$ord;
   el.src = dro.src;
+  dro.src = 'resource/l.svg';
   checkLevelOver();
 }
 
-function onStockMouseDown(event) {
+function onMouseDown(event) {
   onDown(this, event.pageX, event.pageY);
 }
 
@@ -196,7 +205,7 @@ function onDocumentMouseUp(event) {
   onUp(event.pageX, event.pageY);
 }
 
-function onStockTouchStart(event) {
+function onTouchStart(event) {
   onDown(this, event.touches[0].clientX, event.touches[0].clientY);
   act.mouseX = event.touches[0].clientX;
   act.mouseY = event.touches[0].clientY;
@@ -314,6 +323,8 @@ function initActivity() {
   };
   for (i = 0; i < 5; i += 1) {
     act.decrypted.push(ge(sformat('d{}', i)));
+    act.decrypted[i].onmousedown = onMouseDown;
+    act.decrypted[i].ontouchstart = onTouchStart;
   }
   for (i = 0; i < 4; i += 1) {
     act.arr.push(ge(sformat('ar{}',i)));
@@ -321,8 +332,8 @@ function initActivity() {
 
   for (i = 0; i < 5; i += 1) {
     act.stock.push(ge(sformat('s{}', i)));
-    act.stock[i].onmousedown = onStockMouseDown;
-    act.stock[i].ontouchstart = onStockTouchStart;
+    act.stock[i].onmousedown = onMouseDown;
+    act.stock[i].ontouchstart = onTouchStart;
   }
   onResize();
   // Create a <style> element for animations, to avoid CORS issues on Chrome

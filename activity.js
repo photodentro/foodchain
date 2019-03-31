@@ -114,9 +114,12 @@ function onHome(event) {
 
 function onHelp(event) {
   ge('help').style.display = 'flex';
+  ge('audiohelp').currentTime = 0;
+  ge('audiohelp').play();
 }
 
 function onHelpHide(event) {
+  ge('audiohelp').pause();
   ge('help').style.display = '';
 }
 
